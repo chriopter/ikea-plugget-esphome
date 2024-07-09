@@ -1,4 +1,4 @@
-<img width="408" alt="image" src="https://github.com/chriopter/ikea-plugget-esphome/assets/82179548/5697e414-7493-4a69-a712-3ed0e6086121"><img width="427" alt="image" src="https://github.com/chriopter/ikea-plugget-esphome/assets/82179548/b8fdfc03-f6b9-4b9b-a203-8cd7756c74cb"># ikea-plugget-esphome
+# ikea-plugget-esphome
 Connect Ikea Plugget LCD Clock to ESPHome for Basic Actions
 
 ## Overview
