@@ -1,0 +1,169 @@
+esphome:
+  name: ikeaclock
+  friendly_name: Büro Uhr
+  on_boot:
+    priority: -10
+    then:
+      - lambda: |- 
+          pinMode(0, INPUT_PULLUP);
+          pinMode(1, INPUT_PULLUP);
+          pinMode(3, INPUT_PULLUP);
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "X"
+
+ota:
+    - platform: esphome
+      password: "X"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Dev Fallback Hotspot"
+    password: "X"
+
+captive_portal:
+
+
+script:
+  - id: plus_button
+    then:
+      - lambda: |- 
+          pinMode(0, OUTPUT);
+          digitalWrite(0, LOW);
+          delay(100);
+          pinMode(0, INPUT_PULLUP);
+
+  - id: minus_button
+    then:
+      - lambda: |- 
+          pinMode(1, OUTPUT);
+          digitalWrite(1, LOW);
+          delay(100);
+          pinMode(1, INPUT_PULLUP);
+
+  - id: clock_button
+    then:
+      - lambda: |- 
+          pinMode(3, OUTPUT);
+          digitalWrite(3, LOW);
+          delay(100);
+          pinMode(3, INPUT_PULLUP);
+
+  - id: clock_mode
+    then:
+      - lambda: |- 
+          pinMode(3, OUTPUT);
+          digitalWrite(3, LOW);
+          delay(2000);
+          pinMode(3, INPUT_PULLUP);
+
+button:
+  - platform: template
+    name: "Plus Button"
+    on_press:
+      - script.execute: plus_button
+
+  - platform: template
+    name: "Minus Button"
+    on_press:
+      - script.execute: minus_button
+
+  - platform: template
+    name: "Clock Button"
+    on_press:
+      - script.execute: clock_button
+      
+  - platform: template
+    name: "Clock Mode"
+    on_press:
+      - script.execute: clock_mode
+
+  - platform: template
+    name: "Add 1 Hour"
+    on_press:
+      - script.execute: clock_mode
+      - delay: 100ms
+      - script.execute: clock_button
+      - delay: 100ms
+      - script.execute: plus_button
+      - delay: 100ms
+      - script.execute: clock_button
+      - delay: 100ms
+      - script.execute: clock_button
+
+  - platform: template
+    name: "Substract 1 Hour"
+    on_press:
+      - script.execute: clock_mode
+      - delay: 100ms
+      - script.execute: clock_button
+      - delay: 100ms
+      - script.execute: minus_button
+      - delay: 100ms
+      - script.execute: clock_button
+      - delay: 100ms
+      - script.execute: clock_button
+
+  - platform: template
+    name: "Add 1 Minute"
+    on_press:
+      - script.execute: clock_mode
+      - delay: 100ms
+      - script.execute: clock_button
+      - delay: 100ms
+      - script.execute: clock_button
+      - delay: 100ms
+      - script.execute: plus_button
+      - delay: 100ms
+      - script.execute: clock_button
+
+  - platform: template
+    name: "Substract 1 Minute"
+    on_press:
+      - script.execute: clock_mode
+      - delay: 100ms
+      - script.execute: clock_button
+      - delay: 100ms
+      - script.execute: clock_button
+      - delay: 100ms
+      - script.execute: minus_button
+      - delay: 100ms
+      - script.execute: clock_button
+
+globals:
+  - id: virtual_light_state
+    type: bool
+    initial_value: 'false'
+
+switch:
+  - platform: template
+    name: "Backlight"
+    id: virtual_light
+    lambda: 'return id(virtual_light_state);'
+    turn_on_action:
+      - lambda: 'id(virtual_light_state) = true;'
+      - script.execute: plus_button
+      - delay: 100ms
+    turn_off_action:
+      - lambda: 'id(virtual_light_state) = false;'
+      - delay: 100ms
+      - script.execute: plus_button
+      - delay: 100ms
+      - script.execute: plus_button
+      - delay: 100ms
+      - script.execute: plus_button
+      - delay: 100ms
